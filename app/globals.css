@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer utilities {
+  .text-outline {
+    -webkit-text-stroke: 1px rgba(232, 214, 179, 0.25);
+  }
+
+  .glass-card {
+    background: rgba(250, 243, 230, 0.06);
+    border: 1px solid rgba(232, 179, 77, 0.25);
+    backdrop-filter: blur(10px);
+  }
+}
