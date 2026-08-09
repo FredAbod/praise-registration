@@ -12,7 +12,9 @@
       "Bash(node -e ' *)",
       "Bash(curl -s -o /dev/null -w \"logo.png: %{http_code} %{size_download} bytes\\\\n\" http://localhost:3000/logo.png)",
       "Bash(curl -s -o /dev/null -w \"/admin: %{http_code}\\\\n\" http://localhost:3000/admin)",
-      "Bash(taskkill //F //IM node.exe)"
+      "Bash(taskkill //F //IM node.exe)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" -X POST http://localhost:3000/api/admin/login -H \"Content-Type: application/json\" -d '{\"password\":\"khoahv123456789\"}')",
+      "Bash(curl -s -X POST http://localhost:3000/api/admin/login -H \"Content-Type: application/json\" -d '{\"password\":\"wrong\"}')"
     ]
   }
 }

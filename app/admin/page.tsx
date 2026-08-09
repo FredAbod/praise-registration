@@ -7,6 +7,7 @@ import Image from "next/image";
 export default function AdminLogin() {
   const router = useRouter();
   const [password, setPassword] = useState("");
+  const [show, setShow] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -57,14 +58,25 @@ export default function AdminLogin() {
         <label className="block text-xs uppercase tracking-wider text-cream-100/60 mb-1.5">
           Admin password
         </label>
-        <input
-          required
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="••••••••"
-          className="w-full rounded-xl bg-black/25 border border-cream-100/15 focus:border-gold-500 outline-none px-4 py-3 text-cream-50 mb-4"
-        />
+        <div className="relative mb-4">
+          <input
+            required
+            type={show ? "text" : "password"}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
+            autoComplete="current-password"
+            className="w-full rounded-xl bg-black/25 border border-cream-100/15 focus:border-gold-500 outline-none px-4 py-3 pr-16 text-base text-cream-50"
+          />
+          <button
+            type="button"
+            onClick={() => setShow((s) => !s)}
+            className="absolute inset-y-0 right-2 my-auto h-fit rounded-lg px-2 py-1 text-xs font-semibold text-cream-100/60 hover:text-gold-500"
+            aria-label={show ? "Hide password" : "Show password"}
+          >
+            {show ? "Hide" : "Show"}
+          </button>
+        </div>
 
         {error && (
           <p className="text-rust-400 text-sm bg-rust-500/10 border border-rust-500/30 rounded-lg px-3 py-2 mb-4">
