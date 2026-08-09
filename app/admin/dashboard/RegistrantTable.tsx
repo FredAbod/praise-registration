@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type Registration = {
   id: string;
@@ -135,7 +135,7 @@ export default function RegistrantTable({
               <StatusPill status={r.status} />
             </div>
             <div className="mb-3 text-xs text-cream-100/40">
-              {new Date(r.created_at).toLocaleString()}
+              <LocalDate value={r.created_at} />
             </div>
             <ActionButtons
               row={r}
@@ -176,7 +176,7 @@ export default function RegistrantTable({
                     <div className="text-xs text-cream-100/45">{r.phone}</div>
                   </td>
                   <td className="px-5 py-3.5 text-cream-100/50 text-xs">
-                    {new Date(r.created_at).toLocaleString()}
+                    <LocalDate value={r.created_at} />
                   </td>
                   <td className="px-5 py-3.5">
                     <StatusPill status={r.status} />
@@ -231,6 +231,16 @@ function ActionButtons({
       </button>
     </div>
   );
+}
+
+function LocalDate({ value }: { value: string }) {
+  // Format only after mount so the server (which renders with its own
+  // locale/timezone) and the client agree — avoids a hydration mismatch.
+  const [text, setText] = useState("");
+  useEffect(() => {
+    setText(new Date(value).toLocaleString());
+  }, [value]);
+  return <span suppressHydrationWarning>{text}</span>;
 }
 
 function StatusPill({ status }: { status: Registration["status"] }) {
