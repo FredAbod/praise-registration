@@ -14,7 +14,11 @@
       "Bash(curl -s -o /dev/null -w \"/admin: %{http_code}\\\\n\" http://localhost:3000/admin)",
       "Bash(taskkill //F //IM node.exe)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" -X POST http://localhost:3000/api/admin/login -H \"Content-Type: application/json\" -d '{\"password\":\"khoahv123456789\"}')",
-      "Bash(curl -s -X POST http://localhost:3000/api/admin/login -H \"Content-Type: application/json\" -d '{\"password\":\"wrong\"}')"
+      "Bash(curl -s -X POST http://localhost:3000/api/admin/login -H \"Content-Type: application/json\" -d '{\"password\":\"wrong\"}')",
+      "Bash(node \"C:/Users/user/AppData/Local/Temp/claude/C--Users-user-Desktop-apps-praise-registration/f9b9784c-55ac-486d-9736-cfbeeb4b45c1/scratchpad/diag.mjs\" \".env.local\")",
+      "Bash(cp \"C:/Users/user/AppData/Local/Temp/claude/C--Users-user-Desktop-apps-praise-registration/f9b9784c-55ac-486d-9736-cfbeeb4b45c1/scratchpad/diag.mjs\" ./_diag.mjs)",
+      "Bash(node ./_diag.mjs \".env.local\")",
+      "Bash(rm -f ./_diag.mjs)"
     ]
   }
 }

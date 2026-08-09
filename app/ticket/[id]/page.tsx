@@ -3,6 +3,7 @@ import QRCode from "qrcode";
 import { supabaseAdmin } from "@/lib/supabase";
 import Link from "next/link";
 import Image from "next/image";
+import DownloadQrButton from "./DownloadQrButton";
 
 export const dynamic = "force-dynamic";
 
@@ -117,28 +118,10 @@ export default async function TicketPage({
             />
           </div>
 
-          <a
-            href={qrDataUrl}
-            download={`praise-unfiltered-ticket-${registration.id}.png`}
-            className="mx-auto mb-6 flex w-fit items-center gap-2 rounded-full border border-gold-500/60 bg-gold-500/10 px-5 py-2 text-sm font-semibold text-gold-500 transition-colors hover:bg-gold-500/20"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-4 w-4"
-              aria-hidden="true"
-            >
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="7 10 12 15 17 10" />
-              <line x1="12" y1="15" x2="12" y2="3" />
-            </svg>
-            Download QR code
-          </a>
+          <DownloadQrButton
+            qrDataUrl={qrDataUrl}
+            fileName={`praise-unfiltered-ticket-${registration.id}.png`}
+          />
 
           <div
             className={`inline-block border rounded-full px-4 py-1.5 text-sm font-semibold mb-4 ${status.color}`}
@@ -169,9 +152,18 @@ export default async function TicketPage({
             </div>
           </div>
 
+          <div className="rounded-xl border border-gold-500/40 bg-gold-500/10 px-4 py-3 mb-4">
+            <p className="text-sm font-semibold text-gold-500">
+              Keep this QR code safe
+            </p>
+            <p className="text-xs text-cream-100/70 mt-1">
+              It&apos;s the only way you&apos;ll get access to the venue.
+              Download or screenshot it and have it ready at the door.
+            </p>
+          </div>
+
           <p className="text-xs text-cream-100/50">
-            Bookmark or screenshot this page — it always shows your current
-            status.
+            Bookmark this page — it always shows your current status.
           </p>
         </div>
       </div>

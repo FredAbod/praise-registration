@@ -15,6 +15,13 @@ export function supabaseAdmin() {
 
   return createClient(url, key, {
     auth: { persistSession: false },
+    global: {
+      // Opt every query out of Next.js's Data Cache. Without this, Next
+      // caches the underlying GET requests and serves stale rows after a
+      // reload (e.g. showing "pending" after an admin already accepted).
+      fetch: (input, init) =>
+        fetch(input, { ...init, cache: "no-store" }),
+    },
   });
 }
 
