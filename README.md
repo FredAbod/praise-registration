@@ -1,70 +1,68 @@
-# Praise Unfiltered 1.0 — Registration Site
+# Youth Retreat — Registration Site
 
-A registration website for **The Praise Gathering: Praise Unfiltered 1.0** (Gbolahan Sings, 6th Sept 2026).
+Registration for **The Apostolic Church Nigeria — Igbein Area Youth (LAWMNA Territorial) Youth Retreat**.
 
-- Guests register with name, email, phone.
-- They instantly get a personal ticket page with a **QR code** — the QR always shows their live status (Pending / Confirmed / Not Approved).
-- You review everyone at `/admin` and **Accept** or **Reject** them.
-- Registration automatically closes once **50 guests** are confirmed.
+- Theme: **Talent Alone Is Not Enough** (Proverbs 22:29)
+- Dates: **Friday 2nd – Saturday 3rd October 2026**
+- Venue: **23, Ita-Agemo, Igbein, Abeokuta, Ogun State**
+- Fee: **₦500** via Opay transfer; guests upload a receipt; admin confirms payment
+- Confirmed guests get a **QR ticket** for the door
+- Registration is **open-ended** (no seat cap)
 
-No coding required to deploy — just two free accounts and about 10 minutes. Follow the steps below in order.
+## Setup
 
-## 1. Create a free Supabase project (the database)
+### 1. Supabase
 
-1. Go to **supabase.com** and sign up (free).
-2. Click **New project**. Give it any name, set a database password (save it somewhere), pick a region close to you, click **Create**.
-3. Once it's ready, open **SQL Editor** in the left sidebar → **New query**.
-4. Open the `supabase.sql` file included in this folder, copy all of it, paste into the SQL editor, and click **Run**. This creates the `registrations` table.
-5. Go to **Project Settings → API**. You'll need two values in the next step:
-   - **Project URL** (looks like `https://xxxx.supabase.co`)
-   - **service_role key** (under "Project API keys" — click reveal). Keep this secret, never share it publicly.
+1. Create a project (or reuse an existing one).
+2. Open **SQL Editor**, paste and run [`supabase.sql`](supabase.sql). This **renames** the old `registrations` table to `registrations_praise_unfiltered_2026` (archive) and creates a new `registrations` table for Youth Retreat. Nothing is deleted.
+3. Copy **Project URL** and **service_role** key from **Project Settings → API**.
 
-## 2. Deploy the site to Vercel (free hosting)
+### 2. Cloudinary
 
-1. Go to **vercel.com** and sign up (free) — signing up with GitHub is easiest.
-2. If you don't already have this project in a GitHub repo: create a new repo on GitHub and upload everything in this folder to it (GitHub's "Add file → Upload files" works fine, drag the whole folder in).
-3. In Vercel, click **Add New → Project**, choose the GitHub repo you just created, click **Import**.
-4. Before deploying, open **Environment Variables** and add these (values from Supabase in step 1, plus your own choices):
+1. Create a free account at [cloudinary.com](https://cloudinary.com).
+2. From the dashboard, copy **Cloud name**, **API Key**, and **API Secret**.
 
-   | Name | Value |
-   |---|---|
-   | `SUPABASE_URL` | your Supabase Project URL |
-   | `SUPABASE_SERVICE_ROLE_KEY` | your Supabase service_role key |
-   | `ADMIN_PASSWORD` | a password you choose, to log into `/admin` |
-   | `SESSION_SECRET` | any long random string (e.g. mash your keyboard for 30 characters) |
-   | `EVENT_CAPACITY` | `50` |
+### 3. Env vars
 
-5. Click **Deploy**. In about a minute you'll get a live link like `https://praise-unfiltered.vercel.app`.
+Copy `.env.example` → `.env.local` (local) and add the same keys in Vercel:
 
-That's it — your registration site is live.
+| Name | Notes |
+|---|---|
+| `SUPABASE_URL` | Supabase project URL |
+| `SUPABASE_SERVICE_ROLE_KEY` | service_role key |
+| `ADMIN_PASSWORD` | `/admin` login |
+| `SESSION_SECRET` | long random string |
+| `NEXT_PUBLIC_SITE_URL` | live site URL |
+| `PAYMENT_BANK` | `Opay` |
+| `PAYMENT_ACCOUNT_NUMBER` | `7051865730` |
+| `PAYMENT_ACCOUNT_NAME` | `Rachel Oluwabukola` |
+| `PAYMENT_AMOUNT_NGN` | `500` |
+| `CLOUDINARY_CLOUD_NAME` | from Cloudinary |
+| `CLOUDINARY_API_KEY` | from Cloudinary |
+| `CLOUDINARY_API_SECRET` | from Cloudinary |
 
-## 3. Using it
-
-- Share the main link (e.g. `https://praise-unfiltered.vercel.app`) anywhere — flyer, Instagram bio, WhatsApp status.
-- Guests fill the form and land on a ticket page with their QR code. That page updates live, so once you accept/reject them, their ticket updates automatically.
-- You go to `yourdomain.com/admin`, sign in with the `ADMIN_PASSWORD` you set, and see every registrant with **Accept** / **Reject** buttons and a live count out of 50.
-- Once 50 guests are accepted, the registration form automatically closes itself and shows "We're fully booked."
-
-## Running it on your own computer (optional, for testing)
-
-If you want to preview changes before deploying:
+### 4. Run locally
 
 ```bash
 npm install
-cp .env.example .env.local   # then fill in the same values as above
 npm run dev
 ```
 
-Open `http://localhost:3000`.
+Open `http://localhost:3000`. Admin: `/admin`.
+
+## Guest flow
+
+1. Register with name, email, phone.
+2. Ticket page shows Opay details (₦500).
+3. Guest uploads payment screenshot (Cloudinary).
+4. Status → **Awaiting review**.
+5. Admin confirms → **Confirmed** + QR unlocks.
 
 ## Project structure
 
-- `app/page.tsx` — public registration landing page
-- `app/ticket/[id]/page.tsx` — guest's ticket page with QR code and live status
-- `app/admin` — password-protected admin login + dashboard
-- `app/api` — registration, admin login, and accept/reject logic
-- `supabase.sql` — database schema to run once in Supabase
-
-## Changing the look or details
-
-Event details (date, time, artist, sponsorship numbers) live near the top of `app/page.tsx` — edit the text directly and redeploy (Vercel redeploys automatically on every GitHub push). Colors are defined in `tailwind.config.js` under `teal`, `rust`, `cream`, and `gold`.
+- `app/page.tsx` — landing + register
+- `app/ticket/[id]` — payment details, receipt upload, QR when confirmed
+- `app/admin` — review receipts, confirm/reject
+- `app/api/ticket/[id]/receipt` — Cloudinary upload
+- `lib/event.ts` — event + payment helpers
+- `supabase.sql` — schema

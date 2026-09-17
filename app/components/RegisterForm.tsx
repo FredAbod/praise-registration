@@ -3,14 +3,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function RegisterForm({ full }: { full: boolean }) {
+export default function RegisterForm() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [closed, setClosed] = useState(full);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -26,7 +25,6 @@ export default function RegisterForm({ full }: { full: boolean }) {
       const data = await res.json();
 
       if (!res.ok) {
-        if (data.full) setClosed(true);
         setError(data.error || "Something went wrong.");
         setLoading(false);
         return;
@@ -39,25 +37,13 @@ export default function RegisterForm({ full }: { full: boolean }) {
     }
   }
 
-  if (closed) {
-    return (
-      <div className="glass-card rounded-2xl p-6 text-center">
-        <p className="font-display font-bold text-lg text-gold-500 mb-1">
-          We're fully booked
-        </p>
-        <p className="text-cream-100/70 text-sm">
-          All 50 seats for Praise Unfiltered 1.0 have been claimed. Follow{" "}
-          <span className="text-cream-50 font-medium">@Gbolahan_Sings</span>{" "}
-          for the livestream link.
-        </p>
-      </div>
-    );
-  }
-
   return (
-    <form onSubmit={handleSubmit} className="glass-card rounded-2xl p-6 sm:p-8 space-y-4">
+    <form
+      onSubmit={handleSubmit}
+      className="glass-card space-y-4 rounded-2xl p-6 sm:p-8"
+    >
       <div>
-        <label className="block text-xs uppercase tracking-wider text-cream-100/60 mb-1.5">
+        <label className="mb-1.5 block text-xs uppercase tracking-wider text-parchment-100/60">
           Full name
         </label>
         <input
@@ -66,12 +52,12 @@ export default function RegisterForm({ full }: { full: boolean }) {
           onChange={(e) => setName(e.target.value)}
           placeholder="Your name"
           autoComplete="name"
-          className="w-full rounded-xl bg-black/25 border border-cream-100/15 focus:border-gold-500 outline-none px-4 py-3.5 text-base text-cream-50 placeholder:text-cream-100/30 transition-colors"
+          className="w-full rounded-xl border border-parchment-100/15 bg-black/25 px-4 py-3.5 text-base text-parchment-50 outline-none transition-colors placeholder:text-parchment-100/30 focus:border-ember-400"
         />
       </div>
 
       <div>
-        <label className="block text-xs uppercase tracking-wider text-cream-100/60 mb-1.5">
+        <label className="mb-1.5 block text-xs uppercase tracking-wider text-parchment-100/60">
           Email address
         </label>
         <input
@@ -82,12 +68,12 @@ export default function RegisterForm({ full }: { full: boolean }) {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="you@example.com"
-          className="w-full rounded-xl bg-black/25 border border-cream-100/15 focus:border-gold-500 outline-none px-4 py-3.5 text-base text-cream-50 placeholder:text-cream-100/30 transition-colors"
+          className="w-full rounded-xl border border-parchment-100/15 bg-black/25 px-4 py-3.5 text-base text-parchment-50 outline-none transition-colors placeholder:text-parchment-100/30 focus:border-ember-400"
         />
       </div>
 
       <div>
-        <label className="block text-xs uppercase tracking-wider text-cream-100/60 mb-1.5">
+        <label className="mb-1.5 block text-xs uppercase tracking-wider text-parchment-100/60">
           Phone number
         </label>
         <input
@@ -98,12 +84,12 @@ export default function RegisterForm({ full }: { full: boolean }) {
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           placeholder="+234..."
-          className="w-full rounded-xl bg-black/25 border border-cream-100/15 focus:border-gold-500 outline-none px-4 py-3.5 text-base text-cream-50 placeholder:text-cream-100/30 transition-colors"
+          className="w-full rounded-xl border border-parchment-100/15 bg-black/25 px-4 py-3.5 text-base text-parchment-50 outline-none transition-colors placeholder:text-parchment-100/30 focus:border-ember-400"
         />
       </div>
 
       {error && (
-        <p className="text-rust-400 text-sm bg-rust-500/10 border border-rust-500/30 rounded-lg px-3 py-2">
+        <p className="rounded-lg border border-ember-500/30 bg-ember-500/10 px-3 py-2 text-sm text-ember-400">
           {error}
         </p>
       )}
@@ -111,13 +97,13 @@ export default function RegisterForm({ full }: { full: boolean }) {
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-rust-500 hover:bg-rust-600 disabled:opacity-60 transition-colors text-cream-50 font-semibold py-3.5 rounded-xl shadow-lg shadow-rust-600/20"
+        className="w-full rounded-xl bg-bark-500 py-3.5 font-semibold text-parchment-50 shadow-lg shadow-black/25 transition-colors hover:bg-bark-600 disabled:opacity-60"
       >
-        {loading ? "Reserving your seat…" : "Reserve my seat"}
+        {loading ? "Registering…" : "Continue to payment"}
       </button>
 
-      <p className="text-center text-xs text-cream-100/40">
-        You'll get a QR code ticket right after registering.
+      <p className="text-center text-xs text-parchment-100/40">
+        Next step: transfer ₦500 and upload your payment receipt.
       </p>
     </form>
   );

@@ -1,7 +1,15 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { COOKIE_NAME, isValidSessionToken } from "@/lib/auth";
-import { supabaseAdmin, EVENT_CAPACITY } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabase";
+import type { RegistrationStatus } from "@/lib/event";
+
+const ALLOWED: RegistrationStatus[] = [
+  "pending_payment",
+  "awaiting_review",
+  "confirmed",
+  "rejected",
+];
 
 export async function POST(req: Request) {
   const token = cookies().get(COOKIE_NAME)?.value;
@@ -11,33 +19,20 @@ export async function POST(req: Request) {
 
   const { id, status } = await req.json();
 
-  if (!id || !["pending", "accepted", "rejected"].includes(status)) {
+  if (!id || !ALLOWED.includes(status)) {
     return NextResponse.json({ error: "Invalid request." }, { status: 400 });
   }
 
   const supabase = supabaseAdmin();
 
-  if (status === "accepted") {
-    const { count, error: countError } = await supabase
-      .from("registrations")
-      .select("id", { count: "exact", head: true })
-      .eq("status", "accepted");
-
-    if (countError) {
-      return NextResponse.json({ error: countError.message }, { status: 500 });
-    }
-
-    if ((count ?? 0) >= EVENT_CAPACITY) {
-      return NextResponse.json(
-        { error: `All ${EVENT_CAPACITY} seats are already confirmed.` },
-        { status: 409 }
-      );
-    }
+  const patch: Record<string, unknown> = { status };
+  if (status === "confirmed") {
+    patch.confirmed_at = new Date().toISOString();
   }
 
   const { error } = await supabase
     .from("registrations")
-    .update({ status })
+    .update(patch)
     .eq("id", id);
 
   if (error) {

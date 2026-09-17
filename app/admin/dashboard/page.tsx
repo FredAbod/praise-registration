@@ -1,5 +1,6 @@
 import Image from "next/image";
-import { supabaseAdmin, EVENT_CAPACITY } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabase";
+import { EVENT } from "@/lib/event";
 import RegistrantTable from "./RegistrantTable";
 import LogoutButton from "./LogoutButton";
 
@@ -9,38 +10,36 @@ export default async function AdminDashboard() {
   const supabase = supabaseAdmin();
   const { data: registrations, error } = await supabase
     .from("registrations")
-    .select("id, name, email, phone, status, created_at")
+    .select(
+      "id, name, email, phone, status, receipt_url, created_at, receipt_uploaded_at, confirmed_at"
+    )
     .order("created_at", { ascending: false });
 
-  const accepted = (registrations || []).filter(
-    (r) => r.status === "accepted"
-  ).length;
-  const pending = (registrations || []).filter(
-    (r) => r.status === "pending"
-  ).length;
-  const rejected = (registrations || []).filter(
-    (r) => r.status === "rejected"
-  ).length;
+  const rows = registrations || [];
+  const pendingPayment = rows.filter((r) => r.status === "pending_payment").length;
+  const awaitingReview = rows.filter((r) => r.status === "awaiting_review").length;
+  const confirmed = rows.filter((r) => r.status === "confirmed").length;
+  const rejected = rows.filter((r) => r.status === "rejected").length;
 
   return (
     <main className="min-h-screen bg-hero-gradient px-4 py-8 sm:px-6 sm:py-10">
-      <div className="max-w-5xl mx-auto">
+      <div className="mx-auto max-w-5xl">
         <div className="mb-8 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <span className="hidden w-fit items-center rounded-xl bg-cream-50 px-2.5 py-1.5 shadow-sm ring-1 ring-gold-500/30 sm:flex">
+            <span className="hidden overflow-hidden rounded-xl border border-bark-400/40 sm:block sm:w-14">
               <Image
-                src="/logo.png"
-                alt="Gbolahan Sings logo"
-                width={614}
-                height={406}
-                className="h-8 w-auto"
+                src="/flyer.jpg"
+                alt={EVENT.title}
+                width={112}
+                height={160}
+                className="h-auto w-full"
               />
             </span>
             <div>
-              <p className="uppercase tracking-[0.25em] text-[10px] text-gold-500 font-semibold mb-1 sm:text-xs sm:tracking-[0.3em]">
-                The Praise Gathering — Admin
+              <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.25em] text-ember-400 sm:text-xs sm:tracking-[0.3em]">
+                {EVENT.title} — Admin
               </p>
-              <h1 className="font-display font-bold text-2xl sm:text-3xl text-cream-50">
+              <h1 className="font-display text-2xl font-bold text-parchment-50 sm:text-3xl">
                 Registrations
               </h1>
             </div>
@@ -48,24 +47,21 @@ export default async function AdminDashboard() {
           <LogoutButton />
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-          <StatCard label="Confirmed" value={`${accepted} / ${EVENT_CAPACITY}`} accent="text-emerald-400" />
-          <StatCard label="Pending" value={String(pending)} accent="text-gold-500" />
-          <StatCard label="Not approved" value={String(rejected)} accent="text-rust-400" />
-          <StatCard label="Total registered" value={String(registrations?.length || 0)} accent="text-cream-50" />
+        <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-5">
+          <StatCard label="Awaiting review" value={String(awaitingReview)} accent="text-parchment-200" />
+          <StatCard label="Pending payment" value={String(pendingPayment)} accent="text-ember-400" />
+          <StatCard label="Confirmed" value={String(confirmed)} accent="text-emerald-400" />
+          <StatCard label="Rejected" value={String(rejected)} accent="text-red-400" />
+          <StatCard label="Total" value={String(rows.length)} accent="text-parchment-50" />
         </div>
 
         {error && (
-          <p className="text-rust-400 bg-rust-500/10 border border-rust-500/30 rounded-lg px-4 py-3 mb-6">
+          <p className="mb-6 rounded-lg border border-ember-500/30 bg-ember-500/10 px-4 py-3 text-ember-400">
             Couldn&apos;t load registrations: {error.message}
           </p>
         )}
 
-        <RegistrantTable
-          initialRegistrations={registrations || []}
-          capacity={EVENT_CAPACITY}
-          accepted={accepted}
-        />
+        <RegistrantTable initialRegistrations={rows} />
       </div>
     </main>
   );
@@ -82,10 +78,10 @@ function StatCard({
 }) {
   return (
     <div className="glass-card rounded-xl px-4 py-3">
-      <p className="text-[11px] uppercase tracking-wider text-cream-100/45 mb-0.5">
+      <p className="mb-0.5 text-[11px] uppercase tracking-wider text-parchment-100/45">
         {label}
       </p>
-      <p className={`font-display font-bold text-xl ${accent}`}>{value}</p>
+      <p className={`font-display text-xl font-bold ${accent}`}>{value}</p>
     </div>
   );
 }

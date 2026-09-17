@@ -1,38 +1,38 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import type { RegistrationStatus } from "@/lib/event";
 
 type Registration = {
   id: string;
   name: string;
   email: string;
   phone: string;
-  status: "pending" | "accepted" | "rejected";
+  status: RegistrationStatus;
+  receipt_url: string | null;
   created_at: string;
+  receipt_uploaded_at?: string | null;
+  confirmed_at?: string | null;
 };
 
-const TABS: { key: "all" | Registration["status"]; label: string }[] = [
+const TABS: { key: "all" | RegistrationStatus; label: string }[] = [
   { key: "all", label: "All" },
-  { key: "pending", label: "Pending" },
-  { key: "accepted", label: "Confirmed" },
-  { key: "rejected", label: "Not approved" },
+  { key: "awaiting_review", label: "Awaiting review" },
+  { key: "pending_payment", label: "Pending payment" },
+  { key: "confirmed", label: "Confirmed" },
+  { key: "rejected", label: "Rejected" },
 ];
 
 export default function RegistrantTable({
   initialRegistrations,
-  capacity,
-  accepted,
 }: {
   initialRegistrations: Registration[];
-  capacity: number;
-  accepted: number;
 }) {
   const [rows, setRows] = useState(initialRegistrations);
-  const [tab, setTab] = useState<"all" | Registration["status"]>("all");
+  const [tab, setTab] = useState<"all" | RegistrationStatus>("awaiting_review");
   const [query, setQuery] = useState("");
   const [busyId, setBusyId] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [acceptedCount, setAcceptedCount] = useState(accepted);
 
   const filtered = useMemo(() => {
     return rows.filter((r) => {
@@ -49,19 +49,12 @@ export default function RegistrantTable({
     });
   }, [rows, tab, query]);
 
-  async function updateStatus(id: string, status: Registration["status"]) {
+  async function updateStatus(id: string, status: RegistrationStatus) {
     setBusyId(id);
     setErrorMsg(null);
     const previous = rows;
-    const prevRow = rows.find((r) => r.id === id);
 
-    // optimistic update
     setRows((r) => r.map((row) => (row.id === id ? { ...row, status } : row)));
-    if (status === "accepted" && prevRow?.status !== "accepted") {
-      setAcceptedCount((c) => c + 1);
-    } else if (prevRow?.status === "accepted" && status !== "accepted") {
-      setAcceptedCount((c) => Math.max(c - 1, 0));
-    }
 
     const res = await fetch("/api/admin/update", {
       method: "POST",
@@ -72,7 +65,6 @@ export default function RegistrantTable({
     if (!res.ok) {
       const data = await res.json();
       setRows(previous);
-      setAcceptedCount(accepted);
       setErrorMsg(data.error || "Couldn't update this registrant.");
     }
 
@@ -81,16 +73,16 @@ export default function RegistrantTable({
 
   return (
     <div>
-      <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between mb-4">
-        <div className="flex gap-2 flex-wrap">
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-wrap gap-2">
           {TABS.map((t) => (
             <button
               key={t.key}
               onClick={() => setTab(t.key)}
-              className={`text-sm px-3.5 py-1.5 rounded-full border transition-colors ${
+              className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${
                 tab === t.key
-                  ? "bg-gold-500 text-navy-900 border-gold-500 font-semibold"
-                  : "border-cream-100/20 text-cream-100/70 hover:border-cream-100/40"
+                  ? "border-ember-400 bg-ember-400 text-ink-950 font-semibold"
+                  : "border-parchment-100/20 text-parchment-100/70 hover:border-parchment-100/40"
               }`}
             >
               {t.label}
@@ -101,26 +93,19 @@ export default function RegistrantTable({
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search name, email, phone…"
-          className="rounded-full bg-black/25 border border-cream-100/15 focus:border-gold-500 outline-none px-4 py-2 text-sm text-cream-50 placeholder:text-cream-100/30 w-full sm:w-64"
+          className="w-full rounded-full border border-parchment-100/15 bg-black/25 px-4 py-2 text-sm text-parchment-50 outline-none placeholder:text-parchment-100/30 focus:border-ember-400 sm:w-64"
         />
       </div>
 
       {errorMsg && (
-        <p className="text-rust-400 bg-rust-500/10 border border-rust-500/30 rounded-lg px-4 py-2.5 mb-4 text-sm">
+        <p className="mb-4 rounded-lg border border-ember-500/30 bg-ember-500/10 px-4 py-2.5 text-sm text-ember-400">
           {errorMsg}
         </p>
       )}
 
-      {acceptedCount >= capacity && (
-        <p className="text-gold-500 bg-gold-500/10 border border-gold-500/30 rounded-lg px-4 py-2.5 mb-4 text-sm">
-          All {capacity} seats are confirmed. Registration is closed for new guests.
-        </p>
-      )}
-
-      {/* Mobile: stacked cards */}
       <div className="space-y-3 sm:hidden">
         {filtered.length === 0 && (
-          <div className="glass-card rounded-2xl px-4 py-8 text-center text-cream-100/40">
+          <div className="glass-card rounded-2xl px-4 py-8 text-center text-parchment-100/40">
             No registrants here yet.
           </div>
         )}
@@ -128,13 +113,28 @@ export default function RegistrantTable({
           <div key={r.id} className="glass-card rounded-2xl p-4">
             <div className="mb-3 flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="truncate font-medium text-cream-50">{r.name}</p>
-                <p className="truncate text-sm text-cream-100/70">{r.email}</p>
-                <p className="text-xs text-cream-100/45">{r.phone}</p>
+                <p className="truncate font-medium text-parchment-50">{r.name}</p>
+                <p className="truncate text-sm text-parchment-100/70">{r.email}</p>
+                <p className="text-xs text-parchment-100/45">{r.phone}</p>
               </div>
               <StatusPill status={r.status} />
             </div>
-            <div className="mb-3 text-xs text-cream-100/40">
+            {r.receipt_url && (
+              <a
+                href={r.receipt_url}
+                target="_blank"
+                rel="noreferrer"
+                className="mb-3 block overflow-hidden rounded-lg border border-bark-400/40"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={r.receipt_url}
+                  alt={`Receipt for ${r.name}`}
+                  className="max-h-40 w-full object-contain bg-black/30"
+                />
+              </a>
+            )}
+            <div className="mb-3 text-xs text-parchment-100/40">
               <LocalDate value={r.created_at} />
             </div>
             <ActionButtons
@@ -147,35 +147,62 @@ export default function RegistrantTable({
         ))}
       </div>
 
-      {/* Desktop: table */}
       <div className="glass-card hidden overflow-hidden rounded-2xl sm:block">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-cream-100/45 text-xs uppercase tracking-wider border-b border-cream-100/10">
+              <tr className="border-b border-parchment-100/10 text-left text-xs uppercase tracking-wider text-parchment-100/45">
                 <th className="px-5 py-3 font-medium">Guest</th>
                 <th className="px-5 py-3 font-medium">Contact</th>
+                <th className="px-5 py-3 font-medium">Receipt</th>
                 <th className="px-5 py-3 font-medium">Registered</th>
                 <th className="px-5 py-3 font-medium">Status</th>
-                <th className="px-5 py-3 font-medium text-right">Actions</th>
+                <th className="px-5 py-3 text-right font-medium">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-5 py-8 text-center text-cream-100/40">
+                  <td
+                    colSpan={6}
+                    className="px-5 py-8 text-center text-parchment-100/40"
+                  >
                     No registrants here yet.
                   </td>
                 </tr>
               )}
               {filtered.map((r) => (
-                <tr key={r.id} className="border-b border-cream-100/5 last:border-0">
-                  <td className="px-5 py-3.5 text-cream-50 font-medium">{r.name}</td>
-                  <td className="px-5 py-3.5 text-cream-100/70">
-                    <div>{r.email}</div>
-                    <div className="text-xs text-cream-100/45">{r.phone}</div>
+                <tr
+                  key={r.id}
+                  className="border-b border-parchment-100/5 last:border-0"
+                >
+                  <td className="px-5 py-3.5 font-medium text-parchment-50">
+                    {r.name}
                   </td>
-                  <td className="px-5 py-3.5 text-cream-100/50 text-xs">
+                  <td className="px-5 py-3.5 text-parchment-100/70">
+                    <div>{r.email}</div>
+                    <div className="text-xs text-parchment-100/45">{r.phone}</div>
+                  </td>
+                  <td className="px-5 py-3.5">
+                    {r.receipt_url ? (
+                      <a
+                        href={r.receipt_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-block overflow-hidden rounded-lg border border-bark-400/40"
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={r.receipt_url}
+                          alt=""
+                          className="h-14 w-14 object-cover"
+                        />
+                      </a>
+                    ) : (
+                      <span className="text-xs text-parchment-100/35">—</span>
+                    )}
+                  </td>
+                  <td className="px-5 py-3.5 text-xs text-parchment-100/50">
                     <LocalDate value={r.created_at} />
                   </td>
                   <td className="px-5 py-3.5">
@@ -206,24 +233,24 @@ function ActionButtons({
 }: {
   row: Registration;
   busy: boolean;
-  onUpdate: (id: string, status: Registration["status"]) => void;
+  onUpdate: (id: string, status: RegistrationStatus) => void;
   full?: boolean;
 }) {
   return (
     <div className={`flex gap-2 ${full ? "" : "justify-end"}`}>
       <button
-        disabled={busy || row.status === "accepted"}
-        onClick={() => onUpdate(row.id, "accepted")}
-        className={`text-xs font-semibold px-3 py-2 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/25 disabled:opacity-40 transition-colors ${
+        disabled={busy || row.status === "confirmed"}
+        onClick={() => onUpdate(row.id, "confirmed")}
+        className={`rounded-full border border-emerald-500/30 bg-emerald-500/15 px-3 py-2 text-xs font-semibold text-emerald-400 transition-colors hover:bg-emerald-500/25 disabled:opacity-40 ${
           full ? "flex-1" : ""
         }`}
       >
-        Accept
+        Confirm payment
       </button>
       <button
         disabled={busy || row.status === "rejected"}
         onClick={() => onUpdate(row.id, "rejected")}
-        className={`text-xs font-semibold px-3 py-2 rounded-full bg-rust-500/15 text-rust-400 border border-rust-500/30 hover:bg-rust-500/25 disabled:opacity-40 transition-colors ${
+        className={`rounded-full border border-red-500/30 bg-red-500/15 px-3 py-2 text-xs font-semibold text-red-400 transition-colors hover:bg-red-500/25 disabled:opacity-40 ${
           full ? "flex-1" : ""
         }`}
       >
@@ -234,8 +261,6 @@ function ActionButtons({
 }
 
 function LocalDate({ value }: { value: string }) {
-  // Format only after mount so the server (which renders with its own
-  // locale/timezone) and the client agree — avoids a hydration mismatch.
   const [text, setText] = useState("");
   useEffect(() => {
     setText(new Date(value).toLocaleString());
@@ -243,15 +268,24 @@ function LocalDate({ value }: { value: string }) {
   return <span suppressHydrationWarning>{text}</span>;
 }
 
-function StatusPill({ status }: { status: Registration["status"] }) {
-  const map = {
-    pending: "text-gold-500 border-gold-500/40 bg-gold-500/10",
-    accepted: "text-emerald-400 border-emerald-400/40 bg-emerald-400/10",
-    rejected: "text-rust-400 border-rust-400/40 bg-rust-400/10",
+function StatusPill({ status }: { status: RegistrationStatus }) {
+  const map: Record<RegistrationStatus, string> = {
+    pending_payment: "text-ember-400 border-ember-400/40 bg-ember-400/10",
+    awaiting_review:
+      "text-parchment-200 border-parchment-200/40 bg-parchment-200/10",
+    confirmed: "text-emerald-400 border-emerald-400/40 bg-emerald-400/10",
+    rejected: "text-red-400 border-red-400/40 bg-red-400/10",
   };
-  const labels = { pending: "Pending", accepted: "Confirmed", rejected: "Not approved" };
+  const labels: Record<RegistrationStatus, string> = {
+    pending_payment: "Pending payment",
+    awaiting_review: "Awaiting review",
+    confirmed: "Confirmed",
+    rejected: "Rejected",
+  };
   return (
-    <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${map[status]}`}>
+    <span
+      className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${map[status]}`}
+    >
       {labels[status]}
     </span>
   );

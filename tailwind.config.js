@@ -4,54 +4,50 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        teal: {
-          950: "#07211f",
-          900: "#0d2f2c",
-          800: "#123c3c",
-          700: "#1a4d4a",
+        ink: {
+          950: "#1a120c",
+          900: "#241810",
+          800: "#3a281c",
+          700: "#4f3828",
         },
-        rust: {
-          400: "#e0975a",
-          500: "#d97b3f",
-          600: "#c9622a",
-          700: "#a94f21",
+        bark: {
+          400: "#a67c52",
+          500: "#8b5e3c",
+          600: "#6f4a2f",
+          700: "#5a3b26",
         },
-        cream: {
-          50: "#faf3e6",
-          100: "#f2e6d0",
-          200: "#e8d6b3",
+        parchment: {
+          50: "#f7f0e4",
+          100: "#efe4d0",
+          200: "#e2d0b0",
+          300: "#d4bc94",
         },
-        gold: {
-          400: "#f0c675",
-          500: "#e8b34d",
-          600: "#cf9a35",
-        },
-        navy: {
-          900: "#0e1830",
-          800: "#16213f",
+        ember: {
+          400: "#c4844a",
+          500: "#b56e35",
+          600: "#9a5a28",
         },
       },
       fontFamily: {
         display: [
           "var(--font-display)",
-          "Poppins",
-          "Segoe UI",
-          "system-ui",
-          "-apple-system",
-          "sans-serif",
+          "Libre Baskerville",
+          "Georgia",
+          "serif",
         ],
         body: [
           "var(--font-body)",
-          "Inter",
+          "Source Sans 3",
           "Segoe UI",
           "system-ui",
-          "-apple-system",
           "sans-serif",
         ],
       },
       backgroundImage: {
         "hero-gradient":
-          "radial-gradient(120% 120% at 15% 0%, #1a4d4a 0%, #0d2f2c 38%, #16213f 68%, #3a1f14 100%)",
+          "radial-gradient(120% 100% at 50% 0%, #4f3828 0%, #241810 45%, #1a120c 100%)",
+        "parchment-wash":
+          "linear-gradient(165deg, #efe4d0 0%, #e2d0b0 40%, #d4bc94 100%)",
       },
     },
   },

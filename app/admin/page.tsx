@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { EVENT } from "@/lib/event";
 
 export default function AdminLogin() {
   const router = useRouter();
@@ -34,28 +35,28 @@ export default function AdminLogin() {
   }
 
   return (
-    <main className="min-h-screen bg-hero-gradient flex items-center justify-center px-6">
+    <main className="flex min-h-screen items-center justify-center bg-hero-gradient px-6">
       <form
         onSubmit={handleSubmit}
-        className="glass-card rounded-2xl p-7 w-full max-w-sm sm:p-8"
+        className="glass-card w-full max-w-sm rounded-2xl p-7 sm:p-8"
       >
-        <span className="mb-4 flex w-fit items-center rounded-xl bg-cream-50 px-3 py-1.5 shadow-sm ring-1 ring-gold-500/30">
+        <div className="mb-4 max-w-[100px] overflow-hidden rounded-xl border border-bark-400/40">
           <Image
-            src="/logo.png"
-            alt="Gbolahan Sings logo"
-            width={614}
-            height={406}
-            className="h-7 w-auto"
+            src="/flyer.jpg"
+            alt={EVENT.title}
+            width={200}
+            height={280}
+            className="h-auto w-full"
           />
-        </span>
-        <p className="uppercase tracking-[0.3em] text-xs text-gold-500 font-semibold mb-1">
-          The Praise Gathering
+        </div>
+        <p className="mb-1 text-xs font-semibold uppercase tracking-[0.3em] text-ember-400">
+          {EVENT.title} — Admin
         </p>
-        <h1 className="font-display font-bold text-2xl text-cream-50 mb-6">
+        <h1 className="mb-6 font-display text-2xl font-bold text-parchment-50">
           Admin sign in
         </h1>
 
-        <label className="block text-xs uppercase tracking-wider text-cream-100/60 mb-1.5">
+        <label className="mb-1.5 block text-xs uppercase tracking-wider text-parchment-100/60">
           Admin password
         </label>
         <div className="relative mb-4">
@@ -66,12 +67,12 @@ export default function AdminLogin() {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="••••••••"
             autoComplete="current-password"
-            className="w-full rounded-xl bg-black/25 border border-cream-100/15 focus:border-gold-500 outline-none px-4 py-3 pr-16 text-base text-cream-50"
+            className="w-full rounded-xl border border-parchment-100/15 bg-black/25 px-4 py-3 pr-16 text-base text-parchment-50 outline-none focus:border-ember-400"
           />
           <button
             type="button"
             onClick={() => setShow((s) => !s)}
-            className="absolute inset-y-0 right-2 my-auto h-fit rounded-lg px-2 py-1 text-xs font-semibold text-cream-100/60 hover:text-gold-500"
+            className="absolute inset-y-0 right-2 my-auto h-fit rounded-lg px-2 py-1 text-xs font-semibold text-parchment-100/60 hover:text-ember-400"
             aria-label={show ? "Hide password" : "Show password"}
           >
             {show ? "Hide" : "Show"}
@@ -79,7 +80,7 @@ export default function AdminLogin() {
         </div>
 
         {error && (
-          <p className="text-rust-400 text-sm bg-rust-500/10 border border-rust-500/30 rounded-lg px-3 py-2 mb-4">
+          <p className="mb-4 rounded-lg border border-ember-500/30 bg-ember-500/10 px-3 py-2 text-sm text-ember-400">
             {error}
           </p>
         )}
@@ -87,7 +88,7 @@ export default function AdminLogin() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-rust-500 hover:bg-rust-600 disabled:opacity-60 transition-colors text-cream-50 font-semibold py-3 rounded-xl"
+          className="w-full rounded-xl bg-bark-500 py-3 font-semibold text-parchment-50 transition-colors hover:bg-bark-600 disabled:opacity-60"
         >
           {loading ? "Signing in…" : "Sign in"}
         </button>

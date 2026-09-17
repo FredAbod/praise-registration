@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabaseAdmin, EVENT_CAPACITY } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabase";
 
 export async function POST(req: Request) {
   try {
@@ -25,26 +25,6 @@ export async function POST(req: Request) {
 
     const supabase = supabaseAdmin();
 
-    // Enforce the 50 accepted-guest cap.
-    const { count: acceptedCount, error: countError } = await supabase
-      .from("registrations")
-      .select("id", { count: "exact", head: true })
-      .eq("status", "accepted");
-
-    if (countError) throw countError;
-
-    if ((acceptedCount ?? 0) >= EVENT_CAPACITY) {
-      return NextResponse.json(
-        {
-          error:
-            "We've reached our 50-guest capacity for this event. Registration is now closed.",
-          full: true,
-        },
-        { status: 409 }
-      );
-    }
-
-    // Prevent duplicate registrations from the same email.
     const { data: existing, error: existingError } = await supabase
       .from("registrations")
       .select("id")
@@ -62,7 +42,7 @@ export async function POST(req: Request) {
 
     const { data, error } = await supabase
       .from("registrations")
-      .insert({ name, email, phone, status: "pending" })
+      .insert({ name, email, phone, status: "pending_payment" })
       .select("id")
       .single();
 
@@ -74,31 +54,6 @@ export async function POST(req: Request) {
     return NextResponse.json(
       { error: "Something went wrong. Please try again." },
       { status: 500 }
-    );
-  }
-}
-
-export async function GET() {
-  try {
-    const supabase = supabaseAdmin();
-    const { count, error } = await supabase
-      .from("registrations")
-      .select("id", { count: "exact", head: true })
-      .eq("status", "accepted");
-
-    if (error) throw error;
-
-    const accepted = count ?? 0;
-    return NextResponse.json({
-      accepted,
-      capacity: EVENT_CAPACITY,
-      spotsLeft: Math.max(EVENT_CAPACITY - accepted, 0),
-    });
-  } catch (err) {
-    console.error(err);
-    return NextResponse.json(
-      { accepted: 0, capacity: EVENT_CAPACITY, spotsLeft: EVENT_CAPACITY },
-      { status: 200 }
     );
   }
 }
