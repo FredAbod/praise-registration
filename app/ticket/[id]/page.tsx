@@ -19,7 +19,7 @@ async function getRegistration(id: string) {
   const { data, error } = await supabase
     .from("registrations")
     .select(
-      "id, name, email, status, receipt_url, created_at, receipt_uploaded_at, confirmed_at"
+      "id, name, phone, assembly, district, status, receipt_url, created_at, receipt_uploaded_at, confirmed_at"
     )
     .eq("id", id)
     .maybeSingle();
@@ -147,11 +147,25 @@ export default async function TicketPage({
               </span>
             </div>
             <div className="flex justify-between gap-3">
-              <span className="text-parchment-100/60">Email</span>
-              <span className="ml-4 truncate font-medium text-parchment-50">
-                {registration.email}
+              <span className="text-parchment-100/60">Assembly</span>
+              <span className="text-right font-medium text-parchment-50">
+                {registration.assembly}
               </span>
             </div>
+            <div className="flex justify-between gap-3">
+              <span className="text-parchment-100/60">District</span>
+              <span className="text-right font-medium text-parchment-50">
+                {registration.district}
+              </span>
+            </div>
+            {registration.phone && (
+              <div className="flex justify-between gap-3">
+                <span className="text-parchment-100/60">Phone</span>
+                <span className="font-medium text-parchment-50">
+                  {registration.phone}
+                </span>
+              </div>
+            )}
             <div className="flex justify-between gap-3">
               <span className="text-parchment-100/60">Venue</span>
               <span className="text-right font-medium text-parchment-50">

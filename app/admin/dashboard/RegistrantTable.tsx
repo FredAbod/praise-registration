@@ -6,8 +6,9 @@ import type { RegistrationStatus } from "@/lib/event";
 type Registration = {
   id: string;
   name: string;
-  email: string;
-  phone: string;
+  phone: string | null;
+  assembly: string;
+  district: string;
   status: RegistrationStatus;
   receipt_url: string | null;
   created_at: string;
@@ -41,8 +42,9 @@ export default function RegistrantTable({
         const q = query.toLowerCase();
         return (
           r.name.toLowerCase().includes(q) ||
-          r.email.toLowerCase().includes(q) ||
-          r.phone.toLowerCase().includes(q)
+          r.assembly.toLowerCase().includes(q) ||
+          r.district.toLowerCase().includes(q) ||
+          (r.phone || "").toLowerCase().includes(q)
         );
       }
       return true;
@@ -92,7 +94,7 @@ export default function RegistrantTable({
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search name, email, phone…"
+          placeholder="Search name, assembly, district…"
           className="w-full rounded-full border border-parchment-100/15 bg-black/25 px-4 py-2 text-sm text-parchment-50 outline-none placeholder:text-parchment-100/30 focus:border-ember-400 sm:w-64"
         />
       </div>
@@ -114,8 +116,12 @@ export default function RegistrantTable({
             <div className="mb-3 flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <p className="truncate font-medium text-parchment-50">{r.name}</p>
-                <p className="truncate text-sm text-parchment-100/70">{r.email}</p>
-                <p className="text-xs text-parchment-100/45">{r.phone}</p>
+                <p className="truncate text-sm text-parchment-100/70">
+                  {r.assembly} · {r.district}
+                </p>
+                {r.phone && (
+                  <p className="text-xs text-parchment-100/45">{r.phone}</p>
+                )}
               </div>
               <StatusPill status={r.status} />
             </div>
@@ -153,7 +159,7 @@ export default function RegistrantTable({
             <thead>
               <tr className="border-b border-parchment-100/10 text-left text-xs uppercase tracking-wider text-parchment-100/45">
                 <th className="px-5 py-3 font-medium">Guest</th>
-                <th className="px-5 py-3 font-medium">Contact</th>
+                <th className="px-5 py-3 font-medium">Assembly / District</th>
                 <th className="px-5 py-3 font-medium">Receipt</th>
                 <th className="px-5 py-3 font-medium">Registered</th>
                 <th className="px-5 py-3 font-medium">Status</th>
@@ -177,11 +183,14 @@ export default function RegistrantTable({
                   className="border-b border-parchment-100/5 last:border-0"
                 >
                   <td className="px-5 py-3.5 font-medium text-parchment-50">
-                    {r.name}
+                    <div>{r.name}</div>
+                    {r.phone && (
+                      <div className="text-xs text-parchment-100/45">{r.phone}</div>
+                    )}
                   </td>
                   <td className="px-5 py-3.5 text-parchment-100/70">
-                    <div>{r.email}</div>
-                    <div className="text-xs text-parchment-100/45">{r.phone}</div>
+                    <div>{r.assembly}</div>
+                    <div className="text-xs text-parchment-100/45">{r.district}</div>
                   </td>
                   <td className="px-5 py-3.5">
                     {r.receipt_url ? (

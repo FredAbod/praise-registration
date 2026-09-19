@@ -52,7 +52,7 @@ Open `http://localhost:3000`. Admin: `/admin`.
 
 ## Guest flow
 
-1. Register with name, email, phone.
+1. Register with name, assembly, district (phone optional).
 2. Ticket page shows Opay details (₦500).
 3. Guest uploads payment screenshot (Cloudinary).
 4. Status → **Awaiting review**.

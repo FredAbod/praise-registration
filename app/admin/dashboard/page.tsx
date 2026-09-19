@@ -11,7 +11,7 @@ export default async function AdminDashboard() {
   const { data: registrations, error } = await supabase
     .from("registrations")
     .select(
-      "id, name, email, phone, status, receipt_url, created_at, receipt_uploaded_at, confirmed_at"
+      "id, name, phone, assembly, district, status, receipt_url, created_at, receipt_uploaded_at, confirmed_at"
     )
     .order("created_at", { ascending: false });
 

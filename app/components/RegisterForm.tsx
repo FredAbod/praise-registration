@@ -6,8 +6,9 @@ import { useRouter } from "next/navigation";
 export default function RegisterForm() {
   const router = useRouter();
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [assembly, setAssembly] = useState("");
+  const [district, setDistrict] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,7 +21,7 @@ export default function RegisterForm() {
       const res = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, phone }),
+        body: JSON.stringify({ name, phone, assembly, district }),
       });
       const data = await res.json();
 
@@ -37,6 +38,9 @@ export default function RegisterForm() {
     }
   }
 
+  const fieldClass =
+    "w-full rounded-xl border border-parchment-100/15 bg-black/25 px-4 py-3.5 text-base text-parchment-50 outline-none transition-colors placeholder:text-parchment-100/30 focus:border-ember-400";
+
   return (
     <form
       onSubmit={handleSubmit}
@@ -52,39 +56,51 @@ export default function RegisterForm() {
           onChange={(e) => setName(e.target.value)}
           placeholder="Your name"
           autoComplete="name"
-          className="w-full rounded-xl border border-parchment-100/15 bg-black/25 px-4 py-3.5 text-base text-parchment-50 outline-none transition-colors placeholder:text-parchment-100/30 focus:border-ember-400"
+          className={fieldClass}
         />
       </div>
 
       <div>
         <label className="mb-1.5 block text-xs uppercase tracking-wider text-parchment-100/60">
-          Email address
+          Assembly
         </label>
         <input
           required
-          type="email"
-          inputMode="email"
-          autoComplete="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@example.com"
-          className="w-full rounded-xl border border-parchment-100/15 bg-black/25 px-4 py-3.5 text-base text-parchment-50 outline-none transition-colors placeholder:text-parchment-100/30 focus:border-ember-400"
+          value={assembly}
+          onChange={(e) => setAssembly(e.target.value)}
+          placeholder="Your assembly"
+          className={fieldClass}
         />
       </div>
 
       <div>
         <label className="mb-1.5 block text-xs uppercase tracking-wider text-parchment-100/60">
-          Phone number
+          District
         </label>
         <input
           required
+          value={district}
+          onChange={(e) => setDistrict(e.target.value)}
+          placeholder="Your district"
+          className={fieldClass}
+        />
+      </div>
+
+      <div>
+        <label className="mb-1.5 block text-xs uppercase tracking-wider text-parchment-100/60">
+          Phone number{" "}
+          <span className="normal-case tracking-normal text-parchment-100/40">
+            (optional)
+          </span>
+        </label>
+        <input
           type="tel"
           inputMode="tel"
           autoComplete="tel"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           placeholder="+234..."
-          className="w-full rounded-xl border border-parchment-100/15 bg-black/25 px-4 py-3.5 text-base text-parchment-50 outline-none transition-colors placeholder:text-parchment-100/30 focus:border-ember-400"
+          className={fieldClass}
         />
       </div>
 
