@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Libre_Baskerville, Source_Sans_3 } from "next/font/google";
 import { EVENT } from "@/lib/event";
+import SiteFooter from "@/app/components/SiteFooter";
 import "./globals.css";
 
 const sourceSans = Source_Sans_3({
@@ -55,6 +56,7 @@ export default function RootLayout({
     <html lang="en" className={`${sourceSans.variable} ${libre.variable}`}>
       <body className="font-body bg-ink-950 text-parchment-50 antialiased">
         {children}
+        <SiteFooter />
       </body>
     </html>
   );
